@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+            src="https://kit.fontawesome.com/64d58efce2.js"
+            crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-analytics.js"></script>
+<script type="text/javascript">
+    var firebaseConfig = {
+        apiKey: "AIzaSyCl-FfsYxeZ6pt3umUe0P_1zI84u6_-ZFk",
+        authDomain: "splitit-4b4e1.firebaseapp.com",
+        databaseURL: "https://splitit-4b4e1-default-rtdb.firebaseio.com",
+        projectId: "splitit-4b4e1",
+        storageBucket: "splitit-4b4e1.appspot.com",
+        messagingSenderId: "639007389346",
+        appId: "1:639007389346:web:8ccb568e8c1ba4701309fb",
+        measurementId: "G-EYT6H4D7GH"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    function signin() {
+        var email = document.getElementById('email_field').value;
+        var password = document.getElementById('password_field').value;
+
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // Signed in
+                alert("hello")
+                var user = userCredential.user;
+                alert("Welcome my child")
+                window.location = 'home.html'
+
+                // ...
+            })
+            .catch((error) => {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                alert("nahi ho raha kya?")
+            });
+
+    }
+
+    function signup(){
+            const username=document.getElementById("name").value;
+            const userEmail=document.getElementById("email").value;
+            const userContact=document.getElementById("contact-number").value;
+            const userPass=document.getElementById("password").value;
+            const confirm=document.getElementById("confirm").value;
+            if(userPass!=confirm){
+                alert("Password And Confirm Password Doesn't Match")
+            }
+            else
+            {
+                firebase.auth().createUserWithEmailAndPassword(userEmail, userPass)
+                    .then((userCredential) => {
+                        // Signed in
+                        var user1 = userCredential.user;
+                        var user = firebase.auth().currentUser;
+                        var uid = user.uid;
+                        localStorage.setItem('id',uid)
+                        localStorage.setItem('Name',username)
+                        localStorage.setItem('Contact',userContact)
+                        localStorage.setItem('Email',userContact)
+                        localStorage.setItem('status',"first")
+
+                        firebase.database().ref('Users/' + uid ).update({
+                            Name: username,
+                            Email: userEmail,
+                            Contact: userContact,
+                            Uid: uid,
+                            "Have To Pay":"00",
+                            Owe:"00"
+                        });
+                        window.location="home.html"
+                    })
+                    .catch((error) => {
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        // ..
+                    });
+            }
+        }
+    firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+            var user = firebase.auth().currentUser;
+            var uid = user.uid;
+            var name=localStorage.getItem('Name')
+            var contact=localStorage.getItem('Contact')
+            var email=localStorage.getItem('Email')
+            firebase.database().ref('Users/' + uid ).update({
+                Name: name,
+                Email: email,
+                Contact: contact,
+                Uid: uid,
+                "Have To Pay":"00",
+                Owe:"00"
+            });
+            localStorage.setItem('id', uid)
+            window.location="home.html"
+        }
+    });
+</script>
+<div class="container">
+    <div class="forms-container">
+        <div class="signin-signup">
+            <form action="#" class="sign-in-form">
+                <h2 class="title">Sign in</h2>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" placeholder="Email" id="email_field"/>
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="Password" id="password_field"/>
+                </div>
+                <input type="submit" value="Login" class="btn solid" onclick="signin()" />
+
+            </form>
+            <form action="#" class="sign-up-form">
+                <h2 class="title">Sign up</h2>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" placeholder="Your Name" id="name"/>
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="email" placeholder="Email" id="email"/>
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="number" placeholder="Contact No." id="contact-number"/>
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="Password" id="password"/>
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="Confirm Password" id="confirm"/>
+                </div>
+                <input type="submit" class="btn" value="Sign up" onclick="signup()"/>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="panels-container">
+        <div class="panel left-panel">
+            <div class="content">
+                <h3>New here ?</h3>
+                <p>
+                    Sign up and discover great amount of new learnings!
+                </p>
+                <button class="btn transparent" id="sign-up-btn">
+                    Sign up
+                </button>
+            </div>
+            <img src="index-asset/login1.png" class="image" alt="" />
+        </div>
+        <div class="panel right-panel">
+            <div class="content">
+                <h3>One of us ?</h3>
+                <p>
+                    If you already has an account, just sign in. We've missed you!
+                </p>
+                <button class="btn transparent" id="sign-in-btn">
+                    Sign in
+                </button>
+            </div>
+            <img src="index-asset/signup.svg" class="image" style="margin-right: 100px" alt="" />
+        </div>
+    </div>
+</div>
+
+
+
+<script src="index.js"></script>
+
+</body>
+</html>

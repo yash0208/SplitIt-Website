@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SplitIt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+<body>
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-analytics.js"></script>
+<style>
+
+    *{margin: 0; padding: 0;}
+    body{background: #ecf1f4; font-family: sans-serif;}
+
+    .form-wrap{ width: 820px; background: #3e3d3d; padding: 40px 20px; box-sizing: border-box; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);}
+    h1{text-align: center; color: #fff; font-weight: normal; margin-bottom: 20px;}
+
+    input{width: 100%; background: none; border: 1px solid #fff; border-radius: 3px; padding: 6px 15px; box-sizing: border-box; margin-bottom: 20px; font-size: 16px; color: #fff;}
+
+    input[type="button"]{ background: #bac675; border: 0; cursor: pointer; color: #3e3d3d;margin-right: 5px}
+    input[type="button"]:hover{ background: #a4b15c; transition: .6s;}
+    input[type="radio"]{position: static}
+
+    ::placeholder{color: #cec1c1;}
+
+</style>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-analytics.js"></script>
+
+<script type="text/javascript">
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+        apiKey: "AIzaSyCl-FfsYxeZ6pt3umUe0P_1zI84u6_-ZFk",
+        authDomain: "splitit-4b4e1.firebaseapp.com",
+        projectId: "splitit-4b4e1",
+        storageBucket: "splitit-4b4e1.appspot.com",
+        messagingSenderId: "639007389346",
+        appId: "1:639007389346:web:8ccb568e8c1ba4701309fb",
+        measurementId: "G-EYT6H4D7GH"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var uid=localStorage.getItem("id")
+    let o1,owe;
+    let g1,give;
+    firebase.database().ref('/Users/' + uid +"/Owe").once('value').then((snapshot) => {
+        o1 = snapshot.val() ;
+    });
+    firebase.database().ref('/Users/' + uid +"/Have To Pay").once('value').then((snapshot) => {
+        g1 = snapshot.val() ;
+        // ...
+    });
+    var status=localStorage.getItem('status')
+    if(status="first"){
+        alert("new")
+    }
+    function expenses() {
+        var x="2";
+        if(document.getElementById('summer').checked == true) {
+            x="1";
+        }
+        if(document.getElementById('winter').checked == true){
+            x="0";
+        }
+        const userEmail = document.getElementById("em").value;
+        const userdetail = document.getElementById("description").value;
+        const usermoney = document.getElementById("money").value;
+        if(userEmail==""){
+            alert("Enter valid email address")
+        }
+        if(userdetail==""){
+            alert("Enter valid  details")
+        }
+        if(usermoney==""){
+            alert("Enter valid amount")
+        }
+        if(isNaN(usermoney)){
+            alert("Enter valid amount in number")
+        }
+        if(x=="2"){
+            alert("Enter valid choice")
+        }
+        else {
+            if(x=="1"){
+                var uid=localStorage.getItem("id")
+                firebase.database().ref('/Users/' + uid +"/Owe").once('value').then((snapshot) => {
+                    let o2 = snapshot.val();
+                    var of=parseFloat(o2)
+                    var a1=parseFloat(usermoney);
+                    var af=a1/2;
+                    of=of+af;
+                    var oo=of.toString()
+                    firebase.database().ref('Users/' + uid ).update({
+                        Owe : oo
+                    })
+                });
+            }
+            if(x=="0"){
+                var uid=localStorage.getItem("id")
+                firebase.database().ref('/Users/' + uid +"/Have To Pay").once('value').then((snapshot) => {
+                    let g2 = snapshot.val();
+                    var gf=parseFloat(g2)
+                    var uid=localStorage.getItem("id")
+                    var a1=parseFloat(usermoney);
+                    var af=a1/2;
+                    gf=gf+af;
+                    var gg=gf.toString()
+                    firebase.database().ref('Users/' + uid ).update({
+                        "Have To Pay" : gg
+                    })
+                });
+            }
+            var uid=localStorage.getItem("id")
+            firebase.database().ref('Users/' + uid +"/Activity").push({
+                Partner: userEmail,
+                Amount: usermoney,
+                Description: userdetail,
+                Choice: x,
+                Uid: uid,
+            });
+            alert("choice ="+x);
+        }
+    }
+</script>
+<section class="contact">
+    <div class="form-wrap">
+        <form style="font-family: 'Poppins', sans-serif">
+            <h1>Expenses</h1>
+            <div>
+                <p style="color: #ffffff ; margin-bottom: 5px">Enter Your Email</p>
+                <input id="em" type="email" placeholder="Ex:abc@gmail.com">
+            </div>
+            <div>
+                <p style="color:  #ffffff ; margin-bottom: 5px">Expenses Information</p>
+                <input id="description" type="textarea" placeholder="Description">
+            </div>
+            <div>
+                <p style="color:  #ffffff ; margin-bottom: 5px">Enter the Amount</p>
+                <input id="money" type="text" placeholder="Amount">
+            </div>
+            <div style="display: inline-flex;color: #ffffff;justify-content: space-between;width: 100%">
+                <div style="display: inline-flex">
+                    <input type="radio" name="JTP" id="summer" value="summer">
+                    <p style="width: 200px">Paid by You</p>
+                </div>
+                <div style="display: inline-flex">
+                    <input type="radio" name="JTP" id="winter" value="summer">
+                    <p style="width: 300px">Paid by Partner</p>
+                </div>
+            </div>
+            <div>
+                <input type="button" value="Submit " onclick="expenses()" >
+            </div>
+        </form>
+    </div>
+</section>
+
+</body>
+</html>
